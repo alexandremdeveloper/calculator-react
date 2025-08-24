@@ -9,7 +9,8 @@ const initialState = {
     clearDisplay: false,
     operation: null,
     values: [0, 0],
-    current: 0
+    current: 0,
+    expression: ''
 }
 
 export default class Calculator extends Component {
@@ -25,12 +26,12 @@ export default class Calculator extends Component {
     }
 
     clearMemory() {
-        this.setState({...initialState })
+        this.setState({ ...initialState })
     }
 
     setOperation(operation) {
         if (this.state.current === 0) {
-            this.setState({ operation, current: 1, clearDisplay: true})
+            this.setState({ operation, current: 1, clearDisplay: true, expression: this.state.displayValue + ' ' + operation + ' '})
         } else {
             const equals = operation === '='
             const currentOperation = this.state.operation
@@ -45,12 +46,17 @@ export default class Calculator extends Component {
 
             values[1] = 0
 
+            const newExpression = equals
+            ? ''
+            : values[0] + ' ' + operation + ' '
+
             this.setState({
                 displayValue: values[0],
                 operation: equals ? null: operation,
                 current: equals ? 0 : 1,
                 clearDisplay: !equals,
-                values
+                values,
+                expression: newExpression
             })
         }
     }
@@ -64,24 +70,35 @@ export default class Calculator extends Component {
             || this.state.clearDisplay
         const currentValue = clearDisplay ? '' : this.state.displayValue
         const displayValue = currentValue + n
-        this.setState({displayValue, clearDisplay: false})
+
+        const expression = this.state.clearDisplay
+        ? n
+        : this.state.expression + n
+
+        // this.setState({displayValue, clearDisplay: false, expression})
+        let values = [...this.state.values]
 
         if (n !== '.') {
             const i = this.state.current
             const newValue = parseFloat(displayValue)
-            const values = [...this.state.values]
             values[i] = newValue
-            this.setState({ values })
         }
+
+        this.setState({
+        displayValue,
+        clearDisplay: false,
+        expression,
+        values
+    })
     }
 
     render() {
-        const addDigit = n => this.addDigit(n)
-        const setOperation = op => this.setOperation(op)
+        // const addDigit = n => this.addDigit(n)
+        // const setOperation = op => this.setOperation(op)
 
         return (
             <div className="calculator">
-                <Display value={this.state.displayValue} />
+                <Display value={this.state.displayValue} expression={this.state.expression} />
                 <Button label="AC" click={this.clearMemory} triple />
                 <Button label="/" click={this.setOperation}  operation/>
                 <Button label="7" click={this.addDigit} />

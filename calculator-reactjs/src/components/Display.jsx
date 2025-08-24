@@ -3,6 +3,7 @@ import './Display.css'
 
 export default props =>
     <div className="display">
-        {props.value}
+        {/* <div className="expression">{props.expression}</div> */}
+        <div className="value">{props.value}</div>
     </div>
     
